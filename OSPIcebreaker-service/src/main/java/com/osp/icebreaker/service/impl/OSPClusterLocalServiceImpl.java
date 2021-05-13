@@ -200,8 +200,45 @@ public class OSPClusterLocalServiceImpl extends OSPClusterLocalServiceBaseImpl {
 		
 		cluster = super.ospClusterPersistence.update(cluster);
 		
-		updateClusterAsAsset( cluster, sc );
-		 
+		// Register the cluster as an asset
+		AssetEntry assetEntry = super.assetEntryLocalService.updateEntry(
+						cluster.getUserId(), //user id
+						cluster.getGroupId(), //group id
+						cluster.getCreateDate(), // create date
+						cluster.getModifiedDate(), //last modified date
+						OSPCluster.class.getName(), // model class name
+						cluster.getPrimaryKey(), // primary key of the entry
+						cluster.getUuid(), // uuid of the entry
+						0, // class type id
+						sc.getAssetCategoryIds(), //category ids
+						sc.getAssetTagNames(), //tag names
+						true, // listable
+						true, //visible 
+						null, //startDate for what?
+						null, //endDate for what?
+						null, //publishDate 
+						null, //expirationDate 
+						ContentTypes.TEXT_HTML_UTF8, //mimeType 
+						cluster.getClusterName(), //title
+						null, //description
+						null, //summary
+						null, //url
+						null, // layoutUuid
+						0, //height
+						0, //width
+						null //priority
+		);
+				
+		super.assetLinkLocalService.updateLinks(
+						assetEntry.getUserId(), //userId
+						assetEntry.getEntryId(),
+						sc.getAssetLinkEntryIds(), //linkEntryIds
+						AssetLinkConstants.TYPE_RELATED //typeId
+		);
+
+		// Update resource permissions
+		
+		// Create index
 		return cluster;
 	}
 	
@@ -284,9 +321,5 @@ public class OSPClusterLocalServiceImpl extends OSPClusterLocalServiceBaseImpl {
 				);
 	}
 	
-	private void updateClusterAsAsset( OSPCluster cluster, ServiceContext sc ) throws PortalException {
-			
-	}
-
 
 }
